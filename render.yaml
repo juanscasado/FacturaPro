@@ -1,8 +1,9 @@
 services:
-  # Backend API (FastAPI)
+  # Backend API (FastAPI) - FREE TIER
   - type: web
     name: facturapro-backend
     env: python
+    plan: free
     buildCommand: |
       cd backend
       pip install -r requirements.txt
@@ -13,10 +14,11 @@ services:
       - key: DATABASE_URL
         value: sqlite:///./app.db
     
-  # Frontend (React)
+  # Frontend (React) - FREE TIER
   - type: web
     name: facturapro-frontend
     env: static
+    plan: free
     buildCommand: |
       cd frontend
       npm install
