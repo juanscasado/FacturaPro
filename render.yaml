@@ -3,7 +3,7 @@ services:
   - type: web
     name: facturapro-backend
     env: python
-    plan: free
+    plan: starter
     buildCommand: |
       cd backend
       pip install -r requirements.txt
@@ -15,10 +15,8 @@ services:
         value: sqlite:///./app.db
     
   # Frontend (React) - FREE TIER
-  - type: web
+  - type: static
     name: facturapro-frontend
-    env: static
-    plan: free
     buildCommand: |
       cd frontend
       npm install
