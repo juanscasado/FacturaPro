@@ -15,8 +15,9 @@ services:
         value: sqlite:///./app.db
     
   # Frontend (React) - FREE TIER
-  - type: static
+  - type: web
     name: facturapro-frontend
+    env: static
     buildCommand: |
       cd frontend
       npm install
