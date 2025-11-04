@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
-from .routes import auth, clients, invoices, users
+from .routes import auth, clients, invoices, users, alanube
 from fastapi.middleware.cors import CORSMiddleware
 from . import models
 from .database import engine
@@ -43,6 +43,7 @@ app.include_router(auth.router)
 app.include_router(clients.router)
 app.include_router(invoices.router)
 app.include_router(users.router)
+app.include_router(alanube.router)
 
 @app.get("/", response_class=HTMLResponse)
 def root():

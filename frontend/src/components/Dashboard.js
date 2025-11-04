@@ -26,6 +26,23 @@ export default function Dashboard() {
       const decoded = jwtDecode(token);
       setUserEmail(decoded.email || 'Usuario');
 
+      // Verificar si ya hay una conexión a Alanube guardada
+      const alanubeConnected = localStorage.getItem('alanube_connected');
+      const savedAlanubeInfo = localStorage.getItem('alanube_info');
+      
+      if (alanubeConnected === 'true' && savedAlanubeInfo) {
+        try {
+          const parsedInfo = JSON.parse(savedAlanubeInfo);
+          setAlanubeInfo(parsedInfo);
+          setAlanubeStatus({ success: 'Conectado a Alanube (sesión guardada)' });
+          console.log('🔗 Conexión Alanube restaurada desde localStorage');
+        } catch (err) {
+          console.log('❌ Error al parsear info de Alanube guardada:', err);
+          localStorage.removeItem('alanube_info');
+          localStorage.removeItem('alanube_connected');
+        }
+      }
+
       // Cargar clientes desde API
       fetch(API_ENDPOINTS.CLIENTS, {
         headers: { 'Authorization': `Bearer ${token}` }
@@ -52,24 +69,54 @@ export default function Dashboard() {
 
   const handleLogout = () => {
     localStorage.removeItem('token');
+    localStorage.removeItem('alanube_token');
+    localStorage.removeItem('alanube_info');
+    localStorage.removeItem('alanube_connected');
     navigate('/login');
+  };
+
+  const handleAlanubeDisconnect = () => {
+    localStorage.removeItem('alanube_token');
+    localStorage.removeItem('alanube_info');
+    localStorage.removeItem('alanube_connected');
+    setAlanubeInfo(null);
+    setAlanubeStatus(null);
+    console.log('🔌 Desconectado de Alanube');
   };
 
   const handleAlanubeConnect = async () => {
     setAlanubeLoading(true);
     setAlanubeStatus(null);
     try {
-      // Obtener información de autenticación
-      const authInfo = await alanubeLogin();
-      localStorage.setItem('alanube_token', authInfo.token);
+      const token = localStorage.getItem('token');
       
-      // Obtener información de la empresa
-      const companyInfo = await alanubeGetCompany();
-      setAlanubeInfo(companyInfo);
+      // Usar endpoint del backend para validar y obtener info de la empresa
+      const response = await fetch(API_ENDPOINTS.ALANUBE_COMPANY, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
       
-      setAlanubeStatus({ success: 'Conectado a Alanube exitosamente' });
+      const result = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(result.detail || `Error ${response.status}`);
+      }
+      
+      if (result.success) {
+        const companyInfo = result.data;
+        setAlanubeInfo(companyInfo);
+        
+        // Guardar información de la empresa para persistencia
+        localStorage.setItem('alanube_info', JSON.stringify(companyInfo));
+        localStorage.setItem('alanube_connected', 'true');
+        
+        setAlanubeStatus({ success: 'Conectado a Alanube exitosamente' });
+        console.log('✅ Conexión Alanube establecida vía backend');
+      } else {
+        throw new Error(result.message || 'Error en respuesta de Alanube');
+      }
     } catch (err) {
-      setAlanubeStatus({ error: err?.response?.data?.detail || err?.message || 'Error conectando a Alanube' });
+      setAlanubeStatus({ error: err.message || 'Error conectando a Alanube' });
+      console.error('❌ Error en conexión Alanube:', err);
     } finally {
       setAlanubeLoading(false);
     }
@@ -168,13 +215,31 @@ export default function Dashboard() {
                   <p className="text-sm text-muted"><strong>Rango NCF:</strong> {ALANUBE_INVOICE_RANGE.from.toLocaleString()} - {ALANUBE_INVOICE_RANGE.to.toLocaleString()}</p>
                 </div>
                 
-                <button 
-                  className="btn-secondary w-full" 
-                  onClick={handleAlanubeConnect}
-                  disabled={alanubeLoading}
-                >
-                  {alanubeLoading ? 'Conectando...' : 'Conectar a Alanube'}
-                </button>
+                {alanubeInfo ? (
+                  <div className="space-y-2">
+                    <button 
+                      className="btn-outline w-full" 
+                      onClick={handleAlanubeDisconnect}
+                    >
+                      🔌 Desconectar de Alanube
+                    </button>
+                    <button 
+                      className="btn-secondary w-full" 
+                      onClick={handleAlanubeConnect}
+                      disabled={alanubeLoading}
+                    >
+                      {alanubeLoading ? 'Reconectando...' : '🔄 Reconectar'}
+                    </button>
+                  </div>
+                ) : (
+                  <button 
+                    className="btn-secondary w-full" 
+                    onClick={handleAlanubeConnect}
+                    disabled={alanubeLoading}
+                  >
+                    {alanubeLoading ? 'Conectando...' : '🔗 Conectar a Alanube'}
+                  </button>
+                )}
                 
                 {alanubeStatus && (
                   <div className={`p-3 rounded-lg ${alanubeStatus.success ? 'status-success' : 'status-error'}`}>

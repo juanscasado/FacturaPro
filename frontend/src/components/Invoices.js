@@ -92,10 +92,26 @@ export default function Invoices() {
         amount: parseFloat(amount) || 100.00
       };
       
-      console.log('🧪 Enviando a Alanube desde Invoices:', invoiceData);
+      console.log('🧪 Enviando a Alanube vía backend:', invoiceData);
       
-      const res = await alanubeCreateInvoice(invoiceData);
-      console.log('✅ Respuesta de Alanube:', res);
+      // Usar el endpoint del backend en lugar de llamar directamente a Alanube
+      const token = localStorage.getItem('token');
+      const response = await fetch(API_ENDPOINTS.ALANUBE_INVOICE, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(invoiceData)
+      });
+      
+      const res = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(res.detail || `Error ${response.status}`);
+      }
+      
+      console.log('✅ Respuesta del backend/Alanube:', res);
       setAlanubeResult(res);
     } catch (err) {
       console.error('Error completo:', err); // Debug log

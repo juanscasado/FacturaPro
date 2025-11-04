@@ -35,8 +35,10 @@ export const API_ENDPOINTS = {
   DASHBOARD: `${API_CONFIG.BASE_URL}/`,
   DOCS: `${API_CONFIG.BASE_URL}/docs`,
   
-  // Alanube integration (if needed)
-  ALANUBE_STATUS: `${API_CONFIG.BASE_URL}/alanube/status`
+  // Alanube integration (via backend)
+  ALANUBE_VALIDATE: `${API_CONFIG.BASE_URL}/alanube/validate`,
+  ALANUBE_COMPANY: `${API_CONFIG.BASE_URL}/alanube/company`,
+  ALANUBE_INVOICE: `${API_CONFIG.BASE_URL}/alanube/invoice`
 };
 
 console.log('🔧 Configuración API:', {
