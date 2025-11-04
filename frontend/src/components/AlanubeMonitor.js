@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 
 export default function AlanubeMonitor() {
   const [logs, setLogs] = useState([]);
-  const [isMonitoring, setIsMonitoring] = useState(false);
   const [filter, setFilter] = useState('all'); // all, success, error
 
   useEffect(() => {
