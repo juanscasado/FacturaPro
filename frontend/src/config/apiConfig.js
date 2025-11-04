@@ -18,17 +18,25 @@ export const API_CONFIG = {
 // URLs completas para las APIs
 export const API_ENDPOINTS = {
   // Autenticación
-  LOGIN: `${API_CONFIG.BASE_URL}/login/`,
-  REGISTER: `${API_CONFIG.BASE_URL}/register/`,
+  LOGIN: `${API_CONFIG.BASE_URL}/auth/login`,
+  REGISTER: `${API_CONFIG.BASE_URL}/auth/register`,
   
   // Clientes
-  CLIENTS: `${API_CONFIG.BASE_URL}/clients/`,
+  CLIENTS: `${API_CONFIG.BASE_URL}/clients`,
+  CLIENTS_CREATE: `${API_CONFIG.BASE_URL}/clients/`,
   
   // Facturas
-  INVOICES: `${API_CONFIG.BASE_URL}/invoices/`,
+  INVOICES: `${API_CONFIG.BASE_URL}/invoices`,
   
   // Usuarios
-  USERS: `${API_CONFIG.BASE_URL}/users/`
+  USERS: `${API_CONFIG.BASE_URL}/users`,
+  
+  // Dashboard y rutas adicionales
+  DASHBOARD: `${API_CONFIG.BASE_URL}/`,
+  DOCS: `${API_CONFIG.BASE_URL}/docs`,
+  
+  // Alanube integration (if needed)
+  ALANUBE_STATUS: `${API_CONFIG.BASE_URL}/alanube/status`
 };
 
 console.log('🔧 Configuración API:', {

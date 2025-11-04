@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
+import { API_ENDPOINTS } from '../config/apiConfig';
 
 export default function Clients() {
   const [clients, setClients] = useState([]);
@@ -10,10 +10,11 @@ export default function Clients() {
   const [editingClient, setEditingClient] = useState(null);
   const navigate = useNavigate();
 
-  const API_URL = "http://127.0.0.1:8000/clients/";
-
   const token = localStorage.getItem("token");
-  const headers = { Authorization: `Bearer ${token}` };
+  const headers = { 
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}` 
+  };
 
   useEffect(() => {
     if (!token) {
@@ -26,14 +27,24 @@ export default function Clients() {
 
   const fetchClients = async () => {
     try {
-      const res = await axios.get(API_URL, { headers });
-      setClients(res.data);
-    } catch (err) {
-      console.error(err);
-      if (err.response && err.response.status === 401) {
-        localStorage.removeItem("token");
-        navigate("/login");
+      const response = await fetch(API_ENDPOINTS.CLIENTS, { 
+        method: 'GET',
+        headers 
+      });
+      
+      if (!response.ok) {
+        if (response.status === 401) {
+          localStorage.removeItem("token");
+          navigate("/login");
+          return;
+        }
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
+      
+      const data = await response.json();
+      setClients(data);
+    } catch (err) {
+      console.error('Error fetching clients:', err);
     } finally {
       setLoading(false);
     }
@@ -42,20 +53,34 @@ export default function Clients() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      let response;
       if (editingClient) {
         // Actualizar cliente
-        await axios.put(`${API_URL}${editingClient.id}`, { name, rnc }, { headers });
+        response = await fetch(`${API_ENDPOINTS.CLIENTS}/${editingClient.id}`, {
+          method: 'PUT',
+          headers,
+          body: JSON.stringify({ name, rnc })
+        });
         setEditingClient(null);
       } else {
         // Crear cliente
-        await axios.post(API_URL, { name, rnc }, { headers });
+        response = await fetch(API_ENDPOINTS.CLIENTS_CREATE, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({ name, rnc })
+        });
       }
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
       setName("");
       setRnc("");
       fetchClients();
     } catch (err) {
-      console.error(err);
-      alert("Error al guardar el cliente");
+      console.error('Error saving client:', err);
+      alert("Error al guardar el cliente: " + err.message);
     }
   };
 
@@ -68,11 +93,19 @@ export default function Clients() {
   const handleDelete = async (clientId) => {
     if (!window.confirm("¿Seguro que quieres eliminar este cliente?")) return;
     try {
-      await axios.delete(`${API_URL}${clientId}`, { headers });
+      const response = await fetch(`${API_ENDPOINTS.CLIENTS}/${clientId}`, {
+        method: 'DELETE',
+        headers
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
       fetchClients();
     } catch (err) {
-      console.error(err);
-      alert("Error al eliminar el cliente");
+      console.error('Error deleting client:', err);
+      alert("Error al eliminar el cliente: " + err.message);
     }
   };
 

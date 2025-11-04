@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios from "axios";
+import { API_ENDPOINTS } from '../config/apiConfig';
 
 export default function CrearCliente() {
   const [name, setName] = useState("");
@@ -11,15 +11,25 @@ export default function CrearCliente() {
     if (!token) return alert("Usuario no autorizado");
 
     try {
-      await axios.post("http://127.0.0.1:8000/clients/", { name, rnc }, {
-        headers: { Authorization: `Bearer ${token}` }
+      const response = await fetch(API_ENDPOINTS.CLIENTS_CREATE, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}` 
+        },
+        body: JSON.stringify({ name, rnc })
       });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
       alert("Cliente creado!");
       setName("");
       setRnc("");
     } catch (err) {
-      console.error(err);
-      alert("Error al crear cliente");
+      console.error('Error creating client:', err);
+      alert("Error al crear cliente: " + err.message);
     }
   };
 

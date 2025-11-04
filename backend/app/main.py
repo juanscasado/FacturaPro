@@ -1,18 +1,30 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 from .routes import auth, clients, invoices, users
 from fastapi.middleware.cors import CORSMiddleware
 from . import models
 from .database import engine
+import os
 
 # 🔹 Crea las tablas si no existen
 models.Base.metadata.create_all(bind=engine)
 
+# 🔹 Detectar ambiente y configurar URLs del frontend
+def get_frontend_url():
+    # Si estamos en Render (producción)
+    if os.getenv("RENDER"):
+        return "https://facturapro-frontend.onrender.com"
+    # Si estamos en desarrollo local
+    else:
+        return "http://localhost:3000"
+
+# 🔹 Configurar origins dinámicamente
 origins = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
-    "https://facturapro-frontend.onrender.com",  # Render frontend
-    "https://*.onrender.com",  # Otros dominios Render
+    "https://facturapro-frontend.onrender.com",
+    "https://*.onrender.com",
+    get_frontend_url()  # URL dinámica según ambiente
 ]
 
 app = FastAPI(title="FacturaPro RD MVP")
@@ -34,7 +46,8 @@ app.include_router(users.router)
 
 @app.get("/", response_class=HTMLResponse)
 def root():
-    html_content = """
+    frontend_url = get_frontend_url()
+    html_content = f"""
     <!DOCTYPE html>
     <html lang="es">
     <head>
@@ -454,7 +467,7 @@ def root():
                 </p>
                 <a href="/docs" class="btn">📖 Documentación Swagger</a>
                 <a href="/redoc" class="btn">📋 Documentación ReDoc</a>
-                <a href="http://localhost:3000" class="btn">🖥️ Aplicación Frontend</a>
+                <a href="{frontend_url}" class="btn">🖥️ Aplicación Frontend</a>
             </div>
             
             <div class="footer">
