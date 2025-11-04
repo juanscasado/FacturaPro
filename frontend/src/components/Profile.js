@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { API_ENDPOINTS } from '../config/apiConfig';
 
 export default function Profile() {
@@ -113,9 +114,9 @@ export default function Profile() {
               <strong>💡 Tip:</strong> Para configurar o modificar la integración con Alanube, 
               ve al Dashboard principal donde encontrarás las opciones de conexión segura.
             </p>
-            <a href="/dashboard" className="text-blue-600 hover:underline font-semibold">
+            <Link to="/dashboard" className="text-blue-600 hover:underline font-semibold">
               Ir al Dashboard →
-            </a>
+            </Link>
           </div>
         </div>
       </div>

@@ -32,11 +32,14 @@ export default function Dashboard() {
       })
         .then(response => response.json())
         .then(data => {
-          setClients(data);
+          console.log('📊 Datos recibidos de clientes:', data);
+          // Asegurarse de que data es un array
+          setClients(Array.isArray(data) ? data : []);
           setLoading(false);
         })
         .catch(err => {
-          console.error(err);
+          console.error('❌ Error cargando clientes:', err);
+          setClients([]);
           setLoading(false);
         });
 
