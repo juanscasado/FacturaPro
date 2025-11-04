@@ -55,29 +55,29 @@ def root():
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>FacturaPro RD - API Backend</title>
         <style>
-            * {
+            * {{
                 margin: 0;
                 padding: 0;
                 box-sizing: border-box;
-            }
+            }}
             
-            body {
+            body {{
                 font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
                 background: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #60a5fa 100%);
                 min-height: 100vh;
                 color: #1e293b;
-            }
+            }}
             
-            .container {
+            .container {{
                 max-width: 1200px;
                 margin: 0 auto;
                 padding: 2rem;
                 min-height: 100vh;
                 display: flex;
                 flex-direction: column;
-            }
+            }}
             
-            .header {
+            .header {{
                 background: rgba(255, 255, 255, 0.95);
                 backdrop-filter: blur(10px);
                 border-radius: 16px;
@@ -85,9 +85,9 @@ def root():
                 text-align: center;
                 margin-bottom: 2rem;
                 box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            }
+            }}
             
-            .logo {
+            .logo {{
                 width: 80px;
                 height: 80px;
                 background: linear-gradient(135deg, #1e40af, #3b82f6);
@@ -99,52 +99,52 @@ def root():
                 font-size: 2rem;
                 color: white;
                 font-weight: bold;
-            }
+            }}
             
-            .title {
+            .title {{
                 font-size: 3rem;
                 font-weight: 800;
                 color: #1e40af;
                 margin-bottom: 0.5rem;
                 letter-spacing: -0.025em;
-            }
+            }}
             
-            .subtitle {
+            .subtitle {{
                 font-size: 1.25rem;
                 color: #64748b;
                 margin-bottom: 1rem;
-            }
+            }}
             
-            .description {
+            .description {{
                 font-size: 1.125rem;
                 color: #475569;
                 line-height: 1.7;
                 max-width: 600px;
                 margin: 0 auto;
-            }
+            }}
             
-            .content {
+            .content {{
                 display: grid;
                 grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
                 gap: 2rem;
                 margin-bottom: 2rem;
-            }
+            }}
             
-            .card {
+            .card {{
                 background: rgba(255, 255, 255, 0.95);
                 backdrop-filter: blur(10px);
                 border-radius: 16px;
                 padding: 2rem;
                 box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
                 transition: transform 0.3s ease, box-shadow 0.3s ease;
-            }
+            }}
             
-            .card:hover {
+            .card:hover {{
                 transform: translateY(-5px);
                 box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            }
+            }}
             
-            .card-icon {
+            .card-icon {{
                 width: 48px;
                 height: 48px;
                 background: linear-gradient(135deg, #059669, #10b981);
@@ -155,39 +155,39 @@ def root():
                 justify-content: center;
                 font-size: 1.5rem;
                 color: white;
-            }
+            }}
             
-            .card-title {
+            .card-title {{
                 font-size: 1.5rem;
                 font-weight: 700;
                 color: #1e40af;
                 margin-bottom: 0.5rem;
-            }
+            }}
             
-            .card-description {
+            .card-description {{
                 color: #64748b;
                 line-height: 1.6;
                 margin-bottom: 1rem;
-            }
+            }}
             
-            .feature-list {
+            .feature-list {{
                 list-style: none;
                 padding: 0;
-            }
+            }}
             
-            .feature-list li {
+            .feature-list li {{
                 padding: 0.5rem 0;
                 border-bottom: 1px solid #e2e8f0;
                 display: flex;
                 align-items: center;
                 gap: 0.75rem;
-            }
+            }}
             
-            .feature-list li:last-child {
+            .feature-list li:last-child {{
                 border-bottom: none;
-            }
+            }}
             
-            .check-icon {
+            .check-icon {{
                 width: 20px;
                 height: 20px;
                 background: #059669;
@@ -198,42 +198,42 @@ def root():
                 color: white;
                 font-size: 0.75rem;
                 flex-shrink: 0;
-            }
+            }}
             
-            .endpoints {
+            .endpoints {{
                 background: rgba(255, 255, 255, 0.95);
                 backdrop-filter: blur(10px);
                 border-radius: 16px;
                 padding: 2rem;
                 box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            }
+            }}
             
-            .endpoint-group {
+            .endpoint-group {{
                 margin-bottom: 2rem;
-            }
+            }}
             
-            .endpoint-group h3 {
+            .endpoint-group h3 {{
                 color: #1e40af;
                 font-size: 1.25rem;
                 font-weight: 600;
                 margin-bottom: 1rem;
                 padding-bottom: 0.5rem;
                 border-bottom: 2px solid #e2e8f0;
-            }
+            }}
             
-            .endpoint {
+            .endpoint {{
                 display: flex;
                 align-items: center;
                 gap: 1rem;
                 padding: 0.75rem 0;
                 border-bottom: 1px solid #f1f5f9;
-            }
+            }}
             
-            .endpoint:last-child {
+            .endpoint:last-child {{
                 border-bottom: none;
-            }
+            }}
             
-            .method {
+            .method {{
                 padding: 0.25rem 0.75rem;
                 border-radius: 6px;
                 font-weight: 600;
@@ -241,25 +241,25 @@ def root():
                 text-transform: uppercase;
                 min-width: 60px;
                 text-align: center;
-            }
+            }}
             
-            .method.get { background: #dcfce7; color: #166534; }
-            .method.post { background: #dbeafe; color: #1d4ed8; }
-            .method.put { background: #fef3c7; color: #d97706; }
-            .method.delete { background: #fef2f2; color: #dc2626; }
+            .method.get {{ background: #dcfce7; color: #166534; }}
+            .method.post {{ background: #dbeafe; color: #1d4ed8; }}
+            .method.put {{ background: #fef3c7; color: #d97706; }}
+            .method.delete {{ background: #fef2f2; color: #dc2626; }}
             
-            .endpoint-path {
+            .endpoint-path {{
                 font-family: 'Courier New', monospace;
                 color: #475569;
                 font-weight: 500;
-            }
+            }}
             
-            .endpoint-description {
+            .endpoint-description {{
                 color: #64748b;
                 font-size: 0.875rem;
-            }
+            }}
             
-            .status {
+            .status {{
                 background: rgba(255, 255, 255, 0.95);
                 backdrop-filter: blur(10px);
                 border-radius: 16px;
@@ -267,9 +267,9 @@ def root():
                 text-align: center;
                 margin-top: 2rem;
                 box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            }
+            }}
             
-            .status-indicator {
+            .status-indicator {{
                 width: 60px;
                 height: 60px;
                 background: linear-gradient(135deg, #059669, #10b981);
@@ -281,14 +281,14 @@ def root():
                 color: white;
                 font-size: 1.5rem;
                 animation: pulse 2s infinite;
-            }
+            }}
             
-            @keyframes pulse {
-                0%, 100% { transform: scale(1); }
-                50% { transform: scale(1.05); }
-            }
+            @keyframes pulse {{
+                0%, 100% {{ transform: scale(1); }}
+                50% {{ transform: scale(1.05); }}
+            }}
             
-            .btn {
+            .btn {{
                 display: inline-block;
                 padding: 12px 24px;
                 background: linear-gradient(135deg, #1e40af, #3b82f6);
@@ -299,26 +299,26 @@ def root():
                 margin: 0.5rem;
                 transition: all 0.3s ease;
                 box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            }
+            }}
             
-            .btn:hover {
+            .btn:hover {{
                 transform: translateY(-2px);
                 box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-            }
+            }}
             
-            .footer {
+            .footer {{
                 text-align: center;
                 padding: 2rem;
                 color: rgba(255, 255, 255, 0.8);
                 font-size: 0.875rem;
-            }
+            }}
             
-            @media (max-width: 768px) {
-                .container { padding: 1rem; }
-                .title { font-size: 2rem; }
-                .content { grid-template-columns: 1fr; }
-                .endpoint { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
-            }
+            @media (max-width: 768px) {{
+                .container {{ padding: 1rem; }}
+                .title {{ font-size: 2rem; }}
+                .content {{ grid-template-columns: 1fr; }}
+                .endpoint {{ flex-direction: column; align-items: flex-start; gap: 0.5rem; }}
+            }}
         </style>
     </head>
     <body>
@@ -410,12 +410,12 @@ def root():
                     </div>
                     <div class="endpoint">
                         <span class="method put">PUT</span>
-                        <span class="endpoint-path">/clients/{id}</span>
+                        <span class="endpoint-path">/clients/{{id}}</span>
                         <span class="endpoint-description">Actualizar cliente existente</span>
                     </div>
                     <div class="endpoint">
                         <span class="method delete">DELETE</span>
-                        <span class="endpoint-path">/clients/{id}</span>
+                        <span class="endpoint-path">/clients/{{id}}</span>
                         <span class="endpoint-description">Eliminar cliente</span>
                     </div>
                 </div>
@@ -434,12 +434,12 @@ def root():
                     </div>
                     <div class="endpoint">
                         <span class="method get">GET</span>
-                        <span class="endpoint-path">/invoices/{id}</span>
+                        <span class="endpoint-path">/invoices/{{id}}</span>
                         <span class="endpoint-description">Obtener factura específica</span>
                     </div>
                     <div class="endpoint">
                         <span class="method post">POST</span>
-                        <span class="endpoint-path">/invoices/{id}/send-alanube</span>
+                        <span class="endpoint-path">/invoices/{{id}}/send-alanube</span>
                         <span class="endpoint-description">Enviar factura a Alanube</span>
                     </div>
                 </div>
@@ -467,7 +467,7 @@ def root():
                 </p>
                 <a href="/docs" class="btn">📖 Documentación Swagger</a>
                 <a href="/redoc" class="btn">📋 Documentación ReDoc</a>
-                <a href="{frontend_url}" class="btn">🖥️ Aplicación Frontend</a>
+                <a href="{{frontend_url}}" class="btn">🖥️ Aplicación Frontend</a>
             </div>
             
             <div class="footer">
@@ -479,3 +479,4 @@ def root():
     </html>
     """
     return html_content
+
