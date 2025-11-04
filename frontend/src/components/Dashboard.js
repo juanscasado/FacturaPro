@@ -1,10 +1,10 @@
 import React from 'react';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
 import { alanubeLogin, alanubeGetCompany } from '../alanubeApi';
 import { ALANUBE_RNC, ALANUBE_COMPANY_ID, ALANUBE_INVOICE_RANGE } from '../alanubeConfig';
+import { API_ENDPOINTS } from '../config/apiConfig';
 
 export default function Dashboard() {
   const [userEmail, setUserEmail] = useState('');
@@ -27,11 +27,12 @@ export default function Dashboard() {
       setUserEmail(decoded.email || 'Usuario');
 
       // Cargar clientes desde API
-      axios.get('http://127.0.0.1:8000/clients/', {
-        headers: { Authorization: `Bearer ${token}` }
+      fetch(API_ENDPOINTS.CLIENTS, {
+        headers: { 'Authorization': `Bearer ${token}` }
       })
-        .then(res => {
-          setClients(res.data);
+        .then(response => response.json())
+        .then(data => {
+          setClients(data);
           setLoading(false);
         })
         .catch(err => {

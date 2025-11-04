@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import axios from 'axios';
+import { API_ENDPOINTS } from '../config/apiConfig';
 
 export default function Profile() {
   const [email, setEmail] = useState('');
@@ -9,9 +9,13 @@ export default function Profile() {
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) return;
-    axios.get('http://127.0.0.1:8000/users/me', { headers: { Authorization: `Bearer ${token}` }})
-      .then(r => setEmail(r.data.email))
-      .catch(() => {});
+    
+    fetch(`${API_ENDPOINTS.USERS}/me`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    })
+    .then(response => response.json())
+    .then(data => setEmail(data.email))
+    .catch(() => {});
   }, []);
 
   const handleChangePassword = async (e) => {
@@ -19,7 +23,22 @@ export default function Profile() {
     const token = localStorage.getItem('token');
     if (!token) return alert('No autorizado');
     try {
-      await axios.put('http://127.0.0.1:8000/users/me/password', { current_password: currentPassword, new_password: newPassword }, { headers: { Authorization: `Bearer ${token}` }});
+      const response = await fetch(`${API_ENDPOINTS.USERS}/me/password`, {
+        method: 'PUT',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}` 
+        },
+        body: JSON.stringify({ 
+          current_password: currentPassword, 
+          new_password: newPassword 
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
       alert('Contraseña actualizada');
       setCurrentPassword('');
       setNewPassword('');
