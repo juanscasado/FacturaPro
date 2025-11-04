@@ -467,7 +467,7 @@ def root():
                 </p>
                 <a href="/docs" class="btn">📖 Documentación Swagger</a>
                 <a href="/redoc" class="btn">📋 Documentación ReDoc</a>
-                <a href="{{frontend_url}}" class="btn">🖥️ Aplicación Frontend</a>
+                <a href="{frontend_url}" class="btn">🖥️ Aplicación Frontend</a>
             </div>
             
             <div class="footer">
