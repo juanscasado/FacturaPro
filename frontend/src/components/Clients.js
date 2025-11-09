@@ -32,12 +32,17 @@ export default function Clients() {
         headers 
       });
       
+      if (response.status === 401) {
+        console.log('❌ Token expirado al cargar clientes, redirigiendo a login');
+        localStorage.removeItem('token');
+        localStorage.removeItem('alanube_token');
+        localStorage.removeItem('alanube_info');
+        localStorage.removeItem('alanube_connected');
+        navigate('/login');
+        return;
+      }
+      
       if (!response.ok) {
-        if (response.status === 401) {
-          localStorage.removeItem("token");
-          navigate("/login");
-          return;
-        }
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       
@@ -71,6 +76,16 @@ export default function Clients() {
         });
       }
       
+      if (response.status === 401) {
+        console.log('❌ Token expirado al guardar cliente, redirigiendo a login');
+        localStorage.removeItem('token');
+        localStorage.removeItem('alanube_token');
+        localStorage.removeItem('alanube_info');
+        localStorage.removeItem('alanube_connected');
+        navigate('/login');
+        return;
+      }
+      
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -97,6 +112,16 @@ export default function Clients() {
         method: 'DELETE',
         headers
       });
+      
+      if (response.status === 401) {
+        console.log('❌ Token expirado al eliminar cliente, redirigiendo a login');
+        localStorage.removeItem('token');
+        localStorage.removeItem('alanube_token');
+        localStorage.removeItem('alanube_info');
+        localStorage.removeItem('alanube_connected');
+        navigate('/login');
+        return;
+      }
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);

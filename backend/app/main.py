@@ -1,13 +1,15 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
-from .routes import auth, clients, invoices, users, alanube
+from .routes import auth, clients, invoices, users, alanube, commercial
 from fastapi.middleware.cors import CORSMiddleware
 from . import models
+from . import models_extensions
 from .database import engine
 import os
 
 # 🔹 Crea las tablas si no existen
 models.Base.metadata.create_all(bind=engine)
+models_extensions.Base.metadata.create_all(bind=engine)
 
 # 🔹 Detectar ambiente y configurar URLs del frontend
 def get_frontend_url():
@@ -44,6 +46,7 @@ app.include_router(clients.router)
 app.include_router(invoices.router)
 app.include_router(users.router)
 app.include_router(alanube.router)
+app.include_router(commercial.router)  # 🆕 Rutas comerciales
 
 @app.get("/", response_class=HTMLResponse)
 def root():

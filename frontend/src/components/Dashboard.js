@@ -90,12 +90,29 @@ export default function Dashboard() {
     try {
       const token = localStorage.getItem('token');
       
+      console.log('🔧 Debug - URL:', API_ENDPOINTS.ALANUBE_COMPANY);
+      console.log('🔧 Debug - Token exists:', !!token);
+      console.log('🔧 Debug - Token length:', token?.length);
+      
       // Usar endpoint del backend para validar y obtener info de la empresa
       const response = await fetch(API_ENDPOINTS.ALANUBE_COMPANY, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       
+      console.log('🔧 Debug - Response status:', response.status);
+      
+      if (response.status === 401) {
+        console.log('❌ Token expirado en Alanube connect, redirigiendo a login');
+        localStorage.removeItem('token');
+        localStorage.removeItem('alanube_token');
+        localStorage.removeItem('alanube_info');
+        localStorage.removeItem('alanube_connected');
+        navigate('/login');
+        return;
+      }
+      
       const result = await response.json();
+      console.log('🔧 Debug - Response data:', result);
       
       if (!response.ok) {
         throw new Error(result.detail || `Error ${response.status}`);

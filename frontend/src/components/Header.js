@@ -1,29 +1,22 @@
 import React from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 export default function Header() {
   const location = useLocation();
-  const navigate = useNavigate();
-  const token = localStorage.getItem('token');
+  const { user, logout } = useAuth();
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('alanube_token');
-    navigate('/login');
+    logout();
   };
 
   const navItems = [
-    { path: '/dashboard', label: 'Dashboard', icon: '📊' },
-    { path: '/clients', label: 'Clientes', icon: '👥' },
-    { path: '/invoices', label: 'Facturas', icon: '📄' },
-    { path: '/monitor', label: 'Monitor', icon: '📡' },
-    { path: '/profile', label: 'Perfil', icon: '👤' },
+    { path: '/app/dashboard', label: 'Dashboard', icon: '📊' },
+    { path: '/app/clients', label: 'Clientes', icon: '👥' },
+    { path: '/app/invoices', label: 'Facturas', icon: '📄' },
+    { path: '/app/monitor', label: 'Monitor', icon: '📡' },
+    { path: '/app/profile', label: 'Perfil', icon: '👤' },
   ];
-
-  // No mostrar header en login/register
-  if (!token || location.pathname === '/login' || location.pathname === '/register') {
-    return null;
-  }
 
   return (
     <header className="App-header">
@@ -31,6 +24,11 @@ export default function Header() {
         <div className="logo">
           <div className="App-logo">FP</div>
           <h1>FacturaPro RD</h1>
+          {user && (
+            <div className="user-info">
+              <span className="welcome-text">Hola, {user.first_name || user.email}</span>
+            </div>
+          )}
         </div>
         
         <nav className="App-nav">

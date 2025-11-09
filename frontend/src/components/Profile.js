@@ -14,8 +14,19 @@ export default function Profile() {
     fetch(`${API_ENDPOINTS.USERS}/me`, {
       headers: { 'Authorization': `Bearer ${token}` }
     })
-    .then(response => response.json())
-    .then(data => setEmail(data.email))
+    .then(response => {
+      if (response.status === 401) {
+        console.log('❌ Token expirado al cargar perfil, redirigiendo a login');
+        localStorage.removeItem('token');
+        localStorage.removeItem('alanube_token');
+        localStorage.removeItem('alanube_info');
+        localStorage.removeItem('alanube_connected');
+        window.location.href = '/login';
+        return;
+      }
+      return response.json();
+    })
+    .then(data => data && setEmail(data.email))
     .catch(() => {});
   }, []);
 
@@ -35,6 +46,16 @@ export default function Profile() {
           new_password: newPassword 
         })
       });
+      
+      if (response.status === 401) {
+        console.log('❌ Token expirado al cambiar contraseña, redirigiendo a login');
+        localStorage.removeItem('token');
+        localStorage.removeItem('alanube_token');
+        localStorage.removeItem('alanube_info');
+        localStorage.removeItem('alanube_connected');
+        window.location.href = '/login';
+        return;
+      }
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);

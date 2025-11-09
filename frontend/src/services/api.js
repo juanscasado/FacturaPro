@@ -17,14 +17,16 @@ API.interceptors.request.use((config) => {
 });
 
 // Auth
-export const register = (email, password) =>
-  API.post("/auth/register", { email, password }).then(r => r.data);
+export const register = (userData) =>
+  API.post("/auth/register", userData).then(r => r.data);
 
 export const login = async (email, password) => {
   const res = await API.post("/auth/login", { email, password });
-  localStorage.setItem("token", res.data.access_token);
   return res.data;
 };
+
+export const verifyToken = () =>
+  API.get("/auth/verify").then(r => r.data);
 
 // Clients
 export const createClient = (name, rnc) =>

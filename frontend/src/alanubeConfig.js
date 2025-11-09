@@ -3,8 +3,8 @@ export const ALANUBE_API_BASE = 'https://sandbox.alanube.co/dom/v1/';
 export const ALANUBE_PORTAL_URL = 'https://sandbox-reseller.alanube.co/login';
 export const ALANUBE_USERNAME = 'demo@empresa.com';
 export const ALANUBE_PASSWORD = 'DEMO_PASSWORD';
-export const ALANUBE_RNC = 'DEMO_RNC';
-export const ALANUBE_COMPANY_ID = 'DEMO_COMPANY_ID';
+export const ALANUBE_RNC = '101234567'; // RNC de prueba para Sandbox
+export const ALANUBE_COMPANY_ID = 'c6b67743-886d-415b-abe0-72e7db165051';
 export const ALANUBE_INVOICE_RANGE = {
   from: 9484001,
   to: 9485000

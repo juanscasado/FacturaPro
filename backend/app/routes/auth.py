@@ -1,11 +1,13 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Header
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
 from .. import models, schemas, database
 from passlib.hash import sha256_crypt
-from jose import jwt
+from jose import jwt, JWTError
 import os
 
 SECRET_KEY = os.getenv("SECRET_KEY", "mi_clave_secreta")
+security = HTTPBearer()
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -34,3 +36,33 @@ def login(user: schemas.UserCreate, db: Session = Depends(database.get_db)):
     # genera token incluyendo email
     token = jwt.encode({"user_id": db_user.id, "email": db_user.email}, SECRET_KEY, algorithm="HS256")
     return {"access_token": token}
+
+# ================================
+# FUNCIÓN PARA OBTENER USUARIO ACTUAL
+# ================================
+
+def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security), db: Session = Depends(database.get_db)):
+    """Obtener usuario actual desde el token JWT"""
+    try:
+        token = credentials.credentials
+        payload = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+        user_id = payload.get("user_id")
+        email = payload.get("email")
+        
+        if user_id is None:
+            raise HTTPException(status_code=401, detail="Token inválido")
+        
+        # Buscar usuario en la base de datos
+        db_user = db.query(models.User).filter(models.User.id == user_id).first()
+        if not db_user:
+            raise HTTPException(status_code=401, detail="Usuario no encontrado")
+        
+        # Retornar información del usuario para usar en endpoints
+        return {
+            "user_id": user_id,
+            "email": email,
+            "company_id": 1  # Por ahora defaulteamos a company_id=1
+        }
+        
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Token inválido")

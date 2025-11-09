@@ -14,21 +14,60 @@ export default function Invoices() {
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-    if (!token) return;
+    if (!token) {
+      window.location.href = '/login';
+      return;
+    }
+    
     const headers = { 
       'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json'
     };
     
+    const handleAuthError = (response) => {
+      if (response.status === 401) {
+        console.log('❌ Token expirado, redirigiendo a login');
+        localStorage.removeItem('token');
+        localStorage.removeItem('alanube_token');
+        localStorage.removeItem('alanube_info');
+        localStorage.removeItem('alanube_connected');
+        window.location.href = '/login';
+        return true;
+      }
+      return false;
+    };
+    
     // Obtener clientes con fetch
     fetch(API_ENDPOINTS.CLIENTS, { headers })
-      .then(r => r.json())
-      .then(data => setClients(data));
+      .then(response => {
+        if (handleAuthError(response)) return;
+        return response.json();
+      })
+      .then(data => {
+        if (data) {
+          setClients(Array.isArray(data) ? data : []);
+        }
+      })
+      .catch(err => {
+        console.error('❌ Error cargando clientes:', err);
+        setClients([]);
+      });
     
     // Obtener facturas con fetch
     fetch(API_ENDPOINTS.INVOICES, { headers })
-      .then(r => r.json())
-      .then(data => setInvoices(data))
+      .then(response => {
+        if (handleAuthError(response)) return;
+        return response.json();
+      })
+      .then(data => {
+        if (data) {
+          setInvoices(Array.isArray(data) ? data : []);
+        }
+      })
+      .catch(err => {
+        console.error('❌ Error cargando facturas:', err);
+        setInvoices([]);
+      })
       .finally(() => setLoading(false));
   }, []);
 
@@ -52,6 +91,16 @@ export default function Invoices() {
           amount: Number(amount)
         })
       });
+      
+      if (createResponse.status === 401) {
+        console.log('❌ Token expirado, redirigiendo a login');
+        localStorage.removeItem('token');
+        localStorage.removeItem('alanube_token');
+        localStorage.removeItem('alanube_info');
+        localStorage.removeItem('alanube_connected');
+        window.location.href = '/login';
+        return;
+      }
       
       if (!createResponse.ok) {
         throw new Error(`HTTP ${createResponse.status}: ${createResponse.statusText}`);
@@ -84,6 +133,15 @@ export default function Invoices() {
       return;
     }
     
+    // Validar que el cliente tiene RNC
+    const selectedClient = clients.find(c => c.id === parseInt(clientId));
+    if (!selectedClient || !selectedClient.rnc || selectedClient.rnc.trim() === '') {
+      setAlanubeResult({ 
+        error: 'El cliente seleccionado no tiene RNC. Para facturación fiscal es obligatorio que el cliente tenga un RNC válido.' 
+      });
+      return;
+    }
+    
     try {
       // Formato exacto que usa el monitor (que sabemos que funciona)
       const invoiceData = {
@@ -104,6 +162,16 @@ export default function Invoices() {
         },
         body: JSON.stringify(invoiceData)
       });
+      
+      if (response.status === 401) {
+        console.log('❌ Token expirado en test Alanube, redirigiendo a login');
+        localStorage.removeItem('token');
+        localStorage.removeItem('alanube_token');
+        localStorage.removeItem('alanube_info');
+        localStorage.removeItem('alanube_connected');
+        window.location.href = '/login';
+        return;
+      }
       
       const res = await response.json();
       
@@ -234,20 +302,25 @@ export default function Invoices() {
           {/* Resultado de Alanube */}
           {alanubeResult && (
             <div className={`p-4 rounded-lg border-l-4 ${
-              alanubeResult.ncf 
+              alanubeResult.success && alanubeResult.data?.ncf
                 ? 'bg-green-50 border-green-400' 
                 : 'bg-red-50 border-red-400'
             }`}>
-              {alanubeResult.ncf ? (
+              {alanubeResult.success && alanubeResult.data?.ncf ? (
                 <div>
                   <div className="flex items-center gap-2 mb-2">
                     <span className="text-2xl">✅</span>
                     <h4 className="font-bold text-green-800">¡Factura Fiscal Creada!</h4>
                   </div>
                   <div className="text-green-700">
-                    <strong>NCF:</strong> {alanubeResult.ncf}<br/>
-                    <strong>Estado:</strong> {alanubeResult.status}<br/>
+                    <strong>NCF:</strong> {alanubeResult.data.ncf}<br/>
+                    <strong>Estado:</strong> {alanubeResult.data.status}<br/>
+                    <strong>Cliente:</strong> {alanubeResult.data.client}<br/>
+                    <strong>Monto:</strong> RD$ {alanubeResult.data.amount}<br/>
                     <strong>Fecha:</strong> {new Date().toLocaleDateString()}
+                  </div>
+                  <div className="text-xs text-green-600 mt-2">
+                    <strong>ID Alanube:</strong> {alanubeResult.data.id}
                   </div>
                 </div>
               ) : (
@@ -256,10 +329,21 @@ export default function Invoices() {
                     <span className="text-2xl">❌</span>
                     <h4 className="font-bold text-red-800">Error en Alanube</h4>
                   </div>
-                  <div className="text-red-700">{alanubeResult.error}</div>
+                  <div className="text-red-700">
+                    {alanubeResult.error || alanubeResult.message || 'Error desconocido'}
+                  </div>
                   <div className="text-sm text-red-600 mt-2">
                     💡 <strong>Tip:</strong> Ve al Monitor para ver logs detallados
                   </div>
+                  {/* Debug info para desarrollo */}
+                  {process.env.NODE_ENV === 'development' && (
+                    <details className="mt-2 text-xs">
+                      <summary className="cursor-pointer text-red-600">Ver respuesta completa</summary>
+                      <pre className="mt-2 bg-red-100 p-2 rounded text-red-800 overflow-auto">
+                        {JSON.stringify(alanubeResult, null, 2)}
+                      </pre>
+                    </details>
+                  )}
                 </div>
               )}
             </div>
