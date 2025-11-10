@@ -24,8 +24,8 @@ const getBackendURL = () => {
   
   // 3. Producción - URLs por plataforma
   if (window.location.hostname.includes('vercel.app')) {
-    console.log('🚀 Vercel detectado - usando Railway backend');
-    return 'https://facturapro-backend.railway.app';
+    console.log('🚀 Vercel detectado - usando Render backend');
+    return 'https://facturapro-backend.onrender.com';
   }
   
   if (window.location.hostname.includes('onrender.com')) {
@@ -35,7 +35,7 @@ const getBackendURL = () => {
   
   // 4. Fallback por defecto
   console.log('🌐 Usando backend por defecto');
-  return 'https://facturapro-backend.railway.app';
+  return 'https://facturapro-backend.onrender.com';
 };
 
 const backendURL = getBackendURL();
