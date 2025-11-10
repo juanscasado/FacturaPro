@@ -12,6 +12,14 @@ import os
 models.Base.metadata.create_all(bind=engine)
 models_extensions.Base.metadata.create_all(bind=engine)
 
+# 🔹 Función para obtener URL del frontend
+def get_frontend_url():
+    """Obtener URL del frontend según el entorno"""
+    if is_production():
+        return "https://facturapro-frontend.vercel.app"
+    else:
+        return "http://localhost:3000"
+
 # 🔹 Crear la aplicación FastAPI
 app = FastAPI(
     title="FacturaPro API",
