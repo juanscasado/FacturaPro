@@ -38,16 +38,30 @@ class AlanubeResponse(BaseModel):
 # Dependable para obtener usuario actual desde JWT
 def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(database.get_db)):
     try:
+        print(f"🔍 DEBUG - Token recibido: {token[:50] if token else 'None'}...")
+        print(f"🔍 DEBUG - SECRET_KEY: {SECRET_KEY[:20] if SECRET_KEY else 'None'}...")
+        
         payload = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+        print(f"🔍 DEBUG - Payload decodificado: {payload}")
+        
         user_id = payload.get("user_id")
         if user_id is None:
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token inválido")
+            print("❌ DEBUG - user_id no encontrado en payload")
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token inválido - sin user_id")
+            
         user = db.query(models.User).get(user_id)
         if user is None:
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Usuario no autorizado")
+            print(f"❌ DEBUG - Usuario {user_id} no encontrado en base de datos")
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Usuario no encontrado")
+            
+        print(f"✅ DEBUG - Usuario autenticado: {user.email}")
         return user
-    except JWTError:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token inválido")
+    except JWTError as e:
+        print(f"❌ DEBUG - Error JWT: {str(e)}")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=f"Token inválido: {str(e)}")
+    except Exception as e:
+        print(f"❌ DEBUG - Error general: {str(e)}")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=f"Error de autenticación: {str(e)}")
 
 # Validar conexión con Alanube
 @router.get("/validate", response_model=AlanubeResponse)
@@ -79,6 +93,59 @@ def validate_alanube_connection(current_user: models.User = Depends(get_current_
             success=False,
             message=f"Error conectando con Alanube: {str(e)}"
         )
+
+# TEST: Validar conexión con Alanube SIN AUTENTICACIÓN (solo para debug)
+@router.get("/test-connection")
+def test_alanube_connection_no_auth():
+    try:
+        print(f"🧪 TEST - API Base: {ALANUBE_API_BASE}")
+        print(f"🧪 TEST - Token: {ALANUBE_JWT_TOKEN[:50] if ALANUBE_JWT_TOKEN else 'None'}...")
+        
+        headers = {
+            'Authorization': f'Bearer {ALANUBE_JWT_TOKEN}',
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        }
+        
+        response = requests.get(f'{ALANUBE_API_BASE}company', headers=headers, timeout=30)
+        
+        print(f"🧪 TEST - Response Status: {response.status_code}")
+        print(f"🧪 TEST - Response Text: {response.text[:200]}...")
+        
+        if response.status_code == 200:
+            company_data = response.json()
+            return {
+                "success": True,
+                "message": "✅ Alanube funciona correctamente",
+                "data": company_data,
+                "debug": {
+                    "api_base": ALANUBE_API_BASE,
+                    "token_length": len(ALANUBE_JWT_TOKEN) if ALANUBE_JWT_TOKEN else 0,
+                    "status": response.status_code
+                }
+            }
+        else:
+            return {
+                "success": False,
+                "message": f"❌ Error de Alanube: {response.status_code}",
+                "error": response.text,
+                "debug": {
+                    "api_base": ALANUBE_API_BASE,
+                    "token_length": len(ALANUBE_JWT_TOKEN) if ALANUBE_JWT_TOKEN else 0,
+                    "status": response.status_code
+                }
+            }
+            
+    except Exception as e:
+        return {
+            "success": False,
+            "message": f"❌ Error conectando con Alanube: {str(e)}",
+            "debug": {
+                "api_base": ALANUBE_API_BASE,
+                "token_length": len(ALANUBE_JWT_TOKEN) if ALANUBE_JWT_TOKEN else 0,
+                "error": str(e)
+            }
+        }
 
 # Obtener información de la empresa
 @router.get("/company", response_model=AlanubeResponse)
