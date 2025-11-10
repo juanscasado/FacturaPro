@@ -12,9 +12,9 @@ from pydantic import BaseModel
 from typing import Optional
 
 # Configuración de Alanube desde config
-ALANUBE_API_BASE = ALANUBE_API_URL + '/dom/v1/' if ALANUBE_API_URL else 'https://api.alanube.co/dom/v1/'
+ALANUBE_API_BASE = ALANUBE_API_URL + '/dom/v1/' if ALANUBE_API_URL else 'https://sandbox.alanube.co/dom/v1/'
 ALANUBE_JWT_TOKEN = ALANUBE_TOKEN
-ALANUBE_COMPANY_ID = '672ff0818aca41072899acef'  # Company ID del token actual
+ALANUBE_COMPANY_ID = 'c6b67743-886d-415b-abe0-72e7db165051'  # Company ID del token sandbox
 
 print(f"🧾 Alanube configurado:")
 print(f"   API Base: {ALANUBE_API_BASE}")
@@ -228,7 +228,7 @@ def create_alanube_invoice(
         }
         
         # URL correcta según los tests
-        alanube_url = f'{ALANUBE_API_BASE}invoices'
+        alanube_url = f'{ALANUBE_API_BASE}invoice-fiscals/{ALANUBE_COMPANY_ID}'
         
         print(f"🔍 DEBUG - URL Alanube: {alanube_url}")
         print(f"🔍 DEBUG - ENCF generado: {encf_number}")
