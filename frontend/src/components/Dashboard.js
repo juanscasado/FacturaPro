@@ -29,6 +29,21 @@ export default function Dashboard() {
       const decoded = jwtDecode(token);
       setUserEmail(decoded.email || 'Usuario');
 
+      // Verificar si es un usuario recién registrado
+      const justRegistered = localStorage.getItem('just_registered');
+      if (justRegistered === 'true') {
+        addNotification({
+          type: 'success',
+          title: '¡Bienvenido a FacturaPro! 🎉',
+          message: 'Tu cuenta ha sido creada exitosamente. Para comenzar a facturar, conecta tu sistema con Alanube.',
+          action: {
+            label: 'Conectar Alanube',
+            onClick: () => handleAlanubeConnect(0)
+          }
+        });
+        localStorage.removeItem('just_registered');
+      }
+
       // Verificar si ya hay una conexión a Alanube guardada
       const alanubeConnected = localStorage.getItem('alanube_connected');
       const savedAlanubeInfo = localStorage.getItem('alanube_info');
@@ -332,7 +347,21 @@ export default function Dashboard() {
                   <span className="text-muted">Cargando...</span>
                 </div>
               ) : clients.length === 0 ? (
-                <p className="text-muted">No hay clientes registrados</p>
+                <div className="text-center py-8">
+                  <div className="text-6xl mb-4">👥</div>
+                  <h3 className="text-lg font-semibold text-gray-700 mb-2">
+                    ¡Comienza agregando tus primeros clientes!
+                  </h3>
+                  <p className="text-gray-500 mb-4 text-sm">
+                    Los clientes son necesarios para poder generar facturas fiscales
+                  </p>
+                  <Link 
+                    to="/clients" 
+                    className="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                    <span>➕</span> Agregar mi primer cliente
+                  </Link>
+                </div>
               ) : (
                 <div className="space-y-3">
                   {clients.slice(0, 5).map(client => (

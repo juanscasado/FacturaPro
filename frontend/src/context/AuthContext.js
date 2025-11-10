@@ -79,7 +79,10 @@ export const AuthProvider = ({ children }) => {
       }
     } catch (error) {
       console.error('💥 Error de conexión:', error);
-      return { success: false, error: 'Error de conexión' };
+      const errorMessage = error.name === 'TypeError' && error.message.includes('fetch') 
+        ? `No se puede conectar al servidor. ¿Está el backend ejecutándose en ${API_CONFIG.BASE_URL}?` 
+        : 'Error de conexión';
+      return { success: false, error: errorMessage };
     }
   };
 
@@ -106,6 +109,7 @@ export const AuthProvider = ({ children }) => {
       if (response.ok) {
         const data = await response.json();
         localStorage.setItem('token', data.access_token);
+        localStorage.setItem('just_registered', 'true'); // Marcar como recién registrado
         setUser(data.user);
         console.log('✅ Registro exitoso:', data.user);
         return { success: true, user: data.user };
@@ -117,7 +121,7 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       console.error('💥 Error de conexión completo:', error);
       const errorMessage = error.name === 'TypeError' && error.message.includes('fetch') 
-        ? 'No se puede conectar al servidor. ¿Está el backend ejecutándose en http://localhost:8000?' 
+        ? `No se puede conectar al servidor. ¿Está el backend ejecutándose en ${API_CONFIG.BASE_URL}?` 
         : 'Error de conexión';
       return { success: false, error: errorMessage };
     }
