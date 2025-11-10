@@ -16,7 +16,8 @@ models_extensions.Base.metadata.create_all(bind=engine)
 def get_frontend_url():
     """Obtener URL del frontend según el entorno"""
     if is_production():
-        return "https://facturapro-frontend.vercel.app"
+        # El frontend también está en Render
+        return "https://facturapro-frontend.onrender.com"
     else:
         return "http://localhost:3000"
 

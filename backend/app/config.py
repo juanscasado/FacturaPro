@@ -47,10 +47,9 @@ def get_frontend_urls():
     """Obtiene las URLs del frontend según el entorno"""
     if is_production():
         return [
-            "https://facturapro-frontend.vercel.app",
             "https://facturapro-frontend.onrender.com",
-            "https://facturapro.vercel.app",
-            "https://factura-pro.vercel.app"
+            "https://facturapro.onrender.com",
+            "https://factura-pro.onrender.com"
         ]
     else:
         return [
