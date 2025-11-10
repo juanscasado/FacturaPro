@@ -55,24 +55,44 @@ def login(user: schemas.UserCreate, db: Session = Depends(database.get_db)):
         raise HTTPException(status_code=400, detail="Credenciales incorrectas")
     # genera token incluyendo email
     token = jwt.encode({"user_id": db_user.id, "email": db_user.email}, SECRET_KEY, algorithm="HS256")
-    return {"access_token": token, "token_type": "bearer", "user": {"id": db_user.id, "email": db_user.email}}
-
-@router.get("/verify")
-def verify_token(current_user = Depends(get_current_user), db: Session = Depends(database.get_db)):
-    """Verificar si el token es válido y obtener información del usuario"""
-    db_user = db.query(models.User).filter(models.User.id == current_user["user_id"]).first()
-    if not db_user:
-        raise HTTPException(status_code=401, detail="Usuario no encontrado")
-    
     return {
+        "access_token": token, 
+        "token_type": "bearer", 
         "user": {
-            "id": db_user.id,
+            "id": db_user.id, 
             "email": db_user.email,
             "first_name": getattr(db_user, 'first_name', None),
             "last_name": getattr(db_user, 'last_name', None),
             "company_name": getattr(db_user, 'company_name', None)
         }
     }
+
+@router.get("/verify")
+def verify_token(db: Session = Depends(database.get_db), credentials: HTTPAuthorizationCredentials = Depends(security)):
+    """Verificar si el token es válido y obtener información del usuario"""
+    try:
+        token = credentials.credentials
+        payload = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+        user_id = payload.get("user_id")
+        
+        if user_id is None:
+            raise HTTPException(status_code=401, detail="Token inválido")
+        
+        db_user = db.query(models.User).filter(models.User.id == user_id).first()
+        if not db_user:
+            raise HTTPException(status_code=401, detail="Usuario no encontrado")
+        
+        return {
+            "user": {
+                "id": db_user.id,
+                "email": db_user.email,
+                "first_name": getattr(db_user, 'first_name', None),
+                "last_name": getattr(db_user, 'last_name', None),
+                "company_name": getattr(db_user, 'company_name', None)
+            }
+        }
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Token inválido")
 
 # ================================
 # FUNCIÓN PARA OBTENER USUARIO ACTUAL

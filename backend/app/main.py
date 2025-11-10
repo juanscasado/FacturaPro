@@ -5,40 +5,34 @@ from fastapi.middleware.cors import CORSMiddleware
 from . import models
 from . import models_extensions
 from .database import engine
+from .config import CORS_ORIGINS, is_production, is_development
 import os
 
 # 🔹 Crea las tablas si no existen
 models.Base.metadata.create_all(bind=engine)
 models_extensions.Base.metadata.create_all(bind=engine)
 
-# 🔹 Detectar ambiente y configurar URLs del frontend
-def get_frontend_url():
-    # Si estamos en Render (producción)
-    if os.getenv("RENDER"):
-        return "https://facturapro-frontend.onrender.com"
-    # Si estamos en desarrollo local
-    else:
-        return "http://localhost:3000"
-
-# 🔹 Configurar origins dinámicamente
-origins = [
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-    "https://facturapro-frontend.onrender.com",
-    "https://*.onrender.com",
-    get_frontend_url()  # URL dinámica según ambiente
-]
-
-app = FastAPI(title="FacturaPro RD MVP")
+# 🔹 Crear la aplicación FastAPI
+app = FastAPI(
+    title="FacturaPro API",
+    description="Sistema de Facturación Electrónica para República Dominicana",
+    version="1.0.0",
+    docs_url="/docs" if is_development() else None,
+    redoc_url="/redoc" if is_development() else None
+)
 
 # 🔹 Configurar CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,  # usa la lista de arriba
+    allow_origins=CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+print(f"🚀 FacturaPro API iniciada")
+print(f"🌍 Entorno: {'Producción' if is_production() else 'Desarrollo'}")
+print(f"🌐 CORS configurado para: {CORS_ORIGINS}")
 
 # 🔹 Rutas principales
 app.include_router(auth.router)
@@ -46,7 +40,18 @@ app.include_router(clients.router)
 app.include_router(invoices.router)
 app.include_router(users.router)
 app.include_router(alanube.router)
-app.include_router(commercial.router)  # 🆕 Rutas comerciales
+app.include_router(commercial.router)
+
+# 🔹 Endpoint de salud para verificar conectividad
+@app.get("/health")
+def health_check():
+    """Endpoint para verificar que el servidor está funcionando"""
+    return {
+        "status": "ok",
+        "message": "FacturaPro API funcionando correctamente",
+        "environment": "production" if is_production() else "development",
+        "version": "1.0.0"
+    }
 
 @app.get("/", response_class=HTMLResponse)
 def root():

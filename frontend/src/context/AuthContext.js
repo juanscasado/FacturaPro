@@ -1,15 +1,27 @@
 import React, { useContext } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { API_CONFIG } from '../config/apiConfig';
+import { API_CONFIG, testBackendConnection } from '../config/apiConfig';
 
-// Context para autenticación (implementar según tu sistema)
+// Context para autenticación
 const AuthContext = React.createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = React.useState(null);
   const [loading, setLoading] = React.useState(true);
+  const [backendConnected, setBackendConnected] = React.useState(null);
 
   React.useEffect(() => {
+    // Verificar conexión al backend
+    const checkBackend = async () => {
+      const connected = await testBackendConnection();
+      setBackendConnected(connected);
+      if (!connected) {
+        console.warn('⚠️ Backend no disponible. Modo offline.');
+      }
+    };
+    
+    checkBackend();
+    
     // Verificar token en localStorage
     const token = localStorage.getItem('token');
     if (token) {
@@ -42,6 +54,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
+      console.log('🔐 Intentando login con:', { email });
       const response = await fetch(`${API_CONFIG.BASE_URL}/auth/login`, {
         method: 'POST',
         headers: {
@@ -50,16 +63,22 @@ export const AuthProvider = ({ children }) => {
         body: JSON.stringify({ email, password }),
       });
 
+      console.log('📡 Respuesta del servidor:', response.status);
+
       if (response.ok) {
         const data = await response.json();
+        console.log('✅ Login exitoso, datos recibidos:', data);
         localStorage.setItem('token', data.access_token);
         setUser(data.user);
+        console.log('👤 Usuario establecido en estado:', data.user);
         return { success: true, user: data.user };
       } else {
         const error = await response.json();
+        console.error('❌ Error en login:', error);
         return { success: false, error: error.detail || error.message };
       }
     } catch (error) {
+      console.error('💥 Error de conexión:', error);
       return { success: false, error: 'Error de conexión' };
     }
   };
@@ -71,6 +90,9 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (userData) => {
     try {
+      console.log('🔄 Intentando registro con:', userData);
+      console.log('🌐 URL del backend:', `${API_CONFIG.BASE_URL}/auth/register`);
+      
       const response = await fetch(`${API_CONFIG.BASE_URL}/auth/register`, {
         method: 'POST',
         headers: {
@@ -79,17 +101,25 @@ export const AuthProvider = ({ children }) => {
         body: JSON.stringify(userData),
       });
 
+      console.log('📡 Respuesta del servidor:', response.status, response.statusText);
+
       if (response.ok) {
         const data = await response.json();
         localStorage.setItem('token', data.access_token);
         setUser(data.user);
+        console.log('✅ Registro exitoso:', data.user);
         return { success: true, user: data.user };
       } else {
         const error = await response.json();
+        console.error('❌ Error del servidor:', error);
         return { success: false, error: error.detail || error.message };
       }
     } catch (error) {
-      return { success: false, error: 'Error de conexión' };
+      console.error('💥 Error de conexión completo:', error);
+      const errorMessage = error.name === 'TypeError' && error.message.includes('fetch') 
+        ? 'No se puede conectar al servidor. ¿Está el backend ejecutándose en http://localhost:8000?' 
+        : 'Error de conexión';
+      return { success: false, error: errorMessage };
     }
   };
 
