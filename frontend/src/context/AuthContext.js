@@ -1,5 +1,6 @@
 import React, { useContext } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
+import { API_CONFIG } from '../config/apiConfig';
 
 // Context para autenticación (implementar según tu sistema)
 const AuthContext = React.createContext();
@@ -13,7 +14,7 @@ export const AuthProvider = ({ children }) => {
     const token = localStorage.getItem('token');
     if (token) {
       // Verificar validez del token
-      fetch('/api/auth/verify', {
+      fetch(`${API_CONFIG.BASE_URL}/auth/verify`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -25,7 +26,7 @@ export const AuthProvider = ({ children }) => {
         throw new Error('Token inválido');
       })
       .then(userData => {
-        setUser(userData);
+        setUser(userData.user);
       })
       .catch(() => {
         localStorage.removeItem('token');
@@ -41,7 +42,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const response = await fetch('/api/auth/login', {
+      const response = await fetch(`${API_CONFIG.BASE_URL}/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -51,12 +52,12 @@ export const AuthProvider = ({ children }) => {
 
       if (response.ok) {
         const data = await response.json();
-        localStorage.setItem('token', data.token);
+        localStorage.setItem('token', data.access_token);
         setUser(data.user);
         return { success: true, user: data.user };
       } else {
         const error = await response.json();
-        return { success: false, error: error.message };
+        return { success: false, error: error.detail || error.message };
       }
     } catch (error) {
       return { success: false, error: 'Error de conexión' };
@@ -70,7 +71,7 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (userData) => {
     try {
-      const response = await fetch('/api/auth/register', {
+      const response = await fetch(`${API_CONFIG.BASE_URL}/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -80,12 +81,12 @@ export const AuthProvider = ({ children }) => {
 
       if (response.ok) {
         const data = await response.json();
-        localStorage.setItem('token', data.token);
+        localStorage.setItem('token', data.access_token);
         setUser(data.user);
         return { success: true, user: data.user };
       } else {
         const error = await response.json();
-        return { success: false, error: error.message };
+        return { success: false, error: error.detail || error.message };
       }
     } catch (error) {
       return { success: false, error: 'Error de conexión' };

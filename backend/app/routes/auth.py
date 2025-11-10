@@ -22,11 +22,31 @@ def register(user: schemas.UserCreate, db: Session = Depends(database.get_db)):
         raise HTTPException(status_code=400, detail="La contraseña debe tener al menos 6 caracteres")
 
     hashed_password = sha256_crypt.hash(user.password)
-    new_user = models.User(email=user.email, password=hashed_password)
+    new_user = models.User(
+        email=user.email, 
+        password=hashed_password,
+        first_name=user.first_name,
+        last_name=user.last_name,
+        company_name=user.company_name
+    )
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
-    return new_user
+    
+    # Crear token para login automático
+    token = jwt.encode({"user_id": new_user.id, "email": new_user.email}, SECRET_KEY, algorithm="HS256")
+    
+    return {
+        "access_token": token, 
+        "token_type": "bearer", 
+        "user": {
+            "id": new_user.id, 
+            "email": new_user.email,
+            "first_name": new_user.first_name,
+            "last_name": new_user.last_name,
+            "company_name": new_user.company_name
+        }
+    }
 
 @router.post("/login")
 def login(user: schemas.UserCreate, db: Session = Depends(database.get_db)):
@@ -35,7 +55,24 @@ def login(user: schemas.UserCreate, db: Session = Depends(database.get_db)):
         raise HTTPException(status_code=400, detail="Credenciales incorrectas")
     # genera token incluyendo email
     token = jwt.encode({"user_id": db_user.id, "email": db_user.email}, SECRET_KEY, algorithm="HS256")
-    return {"access_token": token}
+    return {"access_token": token, "token_type": "bearer", "user": {"id": db_user.id, "email": db_user.email}}
+
+@router.get("/verify")
+def verify_token(current_user = Depends(get_current_user), db: Session = Depends(database.get_db)):
+    """Verificar si el token es válido y obtener información del usuario"""
+    db_user = db.query(models.User).filter(models.User.id == current_user["user_id"]).first()
+    if not db_user:
+        raise HTTPException(status_code=401, detail="Usuario no encontrado")
+    
+    return {
+        "user": {
+            "id": db_user.id,
+            "email": db_user.email,
+            "first_name": getattr(db_user, 'first_name', None),
+            "last_name": getattr(db_user, 'last_name', None),
+            "company_name": getattr(db_user, 'company_name', None)
+        }
+    }
 
 # ================================
 # FUNCIÓN PARA OBTENER USUARIO ACTUAL

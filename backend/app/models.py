@@ -7,6 +7,9 @@ class User(Base):
     id = Column(Integer, primary_key=True, index=True)
     email = Column(String, unique=True, index=True)
     password = Column(String)
+    first_name = Column(String, nullable=True)
+    last_name = Column(String, nullable=True)
+    company_name = Column(String, nullable=True)
     clients = relationship("Client", back_populates="user")
 
 class Client(Base):

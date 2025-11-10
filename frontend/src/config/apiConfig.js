@@ -1,11 +1,23 @@
 // Configuración de API según el ambiente
 const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+const isProduction = process.env.REACT_APP_ENVIRONMENT === 'production';
+
+// URL del backend según el entorno
+const getBackendURL = () => {
+  if (process.env.REACT_APP_API_URL) {
+    return process.env.REACT_APP_API_URL;
+  }
+  
+  if (isDevelopment) {
+    return 'http://127.0.0.1:8000';
+  }
+  
+  // Producción - URL por defecto
+  return 'https://facturapro-backend.railway.app';
+};
 
 export const API_CONFIG = {
-  BASE_URL: isDevelopment 
-    ? 'http://127.0.0.1:8000'  // Desarrollo local
-    : 'https://facturapro-backend.onrender.com',  // Producción en Render
-  
+  BASE_URL: getBackendURL(),
   TIMEOUT: 30000,
   
   // Headers por defecto
