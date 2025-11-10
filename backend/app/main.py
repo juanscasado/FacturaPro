@@ -324,6 +324,32 @@ def root():
                 box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
             }}
             
+            .btn-primary {{
+                display: inline-block;
+                padding: 16px 32px;
+                background: linear-gradient(135deg, #dc2626, #ef4444);
+                color: white;
+                text-decoration: none;
+                border-radius: 12px;
+                font-weight: 700;
+                font-size: 1.125rem;
+                margin: 1rem 0.5rem;
+                transition: all 0.3s ease;
+                box-shadow: 0 8px 15px -3px rgba(220, 38, 38, 0.3);
+                animation: subtle-pulse 3s infinite;
+            }}
+            
+            .btn-primary:hover {{
+                transform: translateY(-3px);
+                box-shadow: 0 15px 25px -5px rgba(220, 38, 38, 0.4);
+                background: linear-gradient(135deg, #b91c1c, #dc2626);
+            }}
+            
+            @keyframes subtle-pulse {{
+                0%, 100% {{ box-shadow: 0 8px 15px -3px rgba(220, 38, 38, 0.3); }}
+                50% {{ box-shadow: 0 8px 15px -3px rgba(220, 38, 38, 0.5); }}
+            }}
+            
             .footer {{
                 text-align: center;
                 padding: 2rem;
@@ -481,11 +507,11 @@ def root():
                 <div class="status-indicator">✓</div>
                 <h3 style="color: #059669; margin-bottom: 0.5rem;">Sistema Operativo</h3>
                 <p style="color: #64748b; margin-bottom: 1.5rem;">
-                    La API está funcionando correctamente y lista para recibir peticiones.
+                    La API está funcionando correctamente. ¡Haz clic en el botón rojo para acceder a la aplicación completa!
                 </p>
-                <a href="/docs" class="btn">📖 Documentación Swagger</a>
-                <a href="/redoc" class="btn">📋 Documentación ReDoc</a>
-                <a href="{frontend_url}" class="btn">🖥️ Aplicación Frontend</a>
+                <a href="{frontend_url}" class="btn-primary">� Abrir FacturaPro RD</a>
+                <a href="/docs" class="btn">� Documentación Swagger</a>
+                <a href="/redoc" class="btn">� Documentación ReDoc</a>
             </div>
             
             <div class="footer">
